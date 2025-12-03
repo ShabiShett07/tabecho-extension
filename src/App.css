@@ -7,6 +7,26 @@
   flex-direction: column;
   background: #ffffff;
   overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Disabled state - grey overlay */
+.app-disabled {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.app-disabled::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(128, 128, 128, 0.15);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .app-header {
@@ -18,26 +38,90 @@
 
 .header-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+}
+
+.logo-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .app-title {
   margin: 0;
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.logo-icon {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
+  flex: 1;
+  white-space: nowrap;
 }
 
 .header-actions {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
+/* Global Toggle Switch */
+.global-toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.global-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.global-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: 0.3s;
+  border-radius: 26px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.global-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.global-toggle input:checked + .global-toggle-slider {
+  background-color: rgba(102, 230, 120, 0.4);
+  border-color: #66e678;
+}
+
+.global-toggle input:checked + .global-toggle-slider:before {
+  transform: translateX(22px);
+  background-color: #66e678;
+}
+
+.global-toggle input:focus + .global-toggle-slider {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.global-toggle-slider:hover {
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
 .upgrade-btn {

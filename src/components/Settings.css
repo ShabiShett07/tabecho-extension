@@ -56,6 +56,14 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.setting-input:disabled,
+.setting-textarea:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .setting-checkbox {
   display: flex;
   align-items: flex-start;
@@ -217,4 +225,59 @@
 
 .about a:hover {
   text-decoration: underline;
+}
+
+/* Debug Section */
+.debug-section {
+  background: #f0f9ff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+}
+
+.check-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.check-result pre {
+  margin: 0;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: #374151;
+}
+
+.debug-info {
+  background: #fef3c7;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #fcd34d;
+}
+
+.debug-info h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.debug-info ol {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #78350f;
+}
+
+.debug-info li {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.debug-info li:last-child {
+  margin-bottom: 0;
 }

@@ -8,7 +8,9 @@
     "storage",
     "activeTab",
     "scripting",
-    "idle"
+    "idle",
+    "notifications",
+    "alarms"
   ],
   "host_permissions": [
     "<all_urls>"

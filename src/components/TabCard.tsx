@@ -18,10 +18,20 @@ export default function TabCard({ tab, onRestore, onDelete, onUpdate, isPro }: T
 
   useEffect(() => {
     if (tab.screenshot && isPro) {
-      const url = URL.createObjectURL(tab.screenshot)
-      setScreenshotUrl(url)
-
-      return () => URL.revokeObjectURL(url)
+      try {
+        // Handle both Blob and data URL string formats
+        if (typeof tab.screenshot === 'string') {
+          // Already a data URL, use it directly
+          setScreenshotUrl(tab.screenshot)
+        } else if (tab.screenshot instanceof Blob) {
+          // Convert Blob to object URL
+          const url = URL.createObjectURL(tab.screenshot)
+          setScreenshotUrl(url)
+          return () => URL.revokeObjectURL(url)
+        }
+      } catch (error) {
+        console.error('Error creating screenshot URL:', error)
+      }
     }
   }, [tab.screenshot, isPro])
 

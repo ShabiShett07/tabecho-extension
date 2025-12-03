@@ -1,6 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { TabEchoSettings } from '../storage/db'
 import { updateSettings } from '../storage/settings'
+import {
+  openPayPalCheckout,
+  openRazorpayCheckout,
+  checkSubscriptionStatus,
+  cancelSubscription,
+  getRecommendedProvider,
+  type PaymentProvider,
+} from '../services/payments'
+import { PAYMENT_CONFIG, detectUserCountry, saveUserCountry } from '../config/payments'
 import './Settings.css'
 
 interface SettingsProps {
@@ -12,8 +21,11 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
   const [idleThreshold, setIdleThreshold] = useState(settings.idleThreshold)
   const [autoArchive, setAutoArchive] = useState(settings.autoArchive)
   const [enableScreenshots, setEnableScreenshots] = useState(settings.enableScreenshots)
+  const [autoCloseArchivedTabs, setAutoCloseArchivedTabs] = useState(settings.autoCloseArchivedTabs)
   const [excludedDomains, setExcludedDomains] = useState(settings.domains.join(', '))
   const [saving, setSaving] = useState(false)
+  const [paymentProvider, setPaymentProvider] = useState<PaymentProvider>('paypal')
+  const [userCountry, setUserCountry] = useState<'IN' | 'OTHER'>('OTHER')
 
   const handleSave = async () => {
     setSaving(true)
@@ -27,6 +39,7 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
         idleThreshold,
         autoArchive,
         enableScreenshots: settings.isPro ? enableScreenshots : false,
+        autoCloseArchivedTabs,
         domains,
       })
 
@@ -98,13 +111,50 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
     }
   }
 
-  const handleUpgradeToPro = () => {
-    // This would open Stripe checkout in production
-    if (confirm('Demo mode: Upgrade to Pro? (This will enable Pro features without payment)')) {
-      updateSettings({ isPro: true, enableScreenshots: true, retentionLimit: -1, retentionDays: -1 })
-      onUpdate()
+  const handleUpgrade = async (plan: 'monthly' | 'yearly') => {
+    try {
+      if (paymentProvider === 'razorpay') {
+        await openRazorpayCheckout(plan)
+      } else {
+        await openPayPalCheckout(plan)
+      }
+    } catch (error) {
+      console.error('Error opening checkout:', error)
+      alert('Failed to open checkout. Please try again.')
     }
   }
+
+  const handleCancelSubscription = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? You will lose access to Pro features.')) {
+      return
+    }
+
+    try {
+      await cancelSubscription()
+      alert('Subscription cancelled successfully.')
+      onUpdate()
+    } catch (error) {
+      console.error('Error canceling subscription:', error)
+      alert('Failed to cancel subscription. Please try again.')
+    }
+  }
+
+  const handleCountryChange = async (country: 'IN' | 'OTHER') => {
+    setUserCountry(country)
+    await saveUserCountry(country)
+    setPaymentProvider(country === 'IN' ? 'razorpay' : 'paypal')
+  }
+
+  // Check subscription status and detect country on mount
+  useEffect(() => {
+    checkSubscriptionStatus()
+
+    // Detect user country and set payment provider
+    detectUserCountry().then((country) => {
+      setUserCountry(country)
+      setPaymentProvider(country === 'IN' ? 'razorpay' : 'paypal')
+    })
+  }, [])
 
   return (
     <div className="settings">
@@ -132,22 +182,6 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
           <label className="setting-checkbox">
             <input
               type="checkbox"
-              checked={autoArchive}
-              onChange={(e) => setAutoArchive(e.target.checked)}
-            />
-            <span>
-              <strong>Auto-archive idle tabs</strong>
-              <span className="setting-description">
-                Automatically archive tabs when they become idle
-              </span>
-            </span>
-          </label>
-        </div>
-
-        <div className="setting-item">
-          <label className="setting-checkbox">
-            <input
-              type="checkbox"
               checked={enableScreenshots}
               onChange={(e) => setEnableScreenshots(e.target.checked)}
               disabled={!settings.isPro}
@@ -157,6 +191,22 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
               {!settings.isPro && <span className="pro-badge-inline">PRO</span>}
               <span className="setting-description">
                 Save visual thumbnails of archived tabs
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div className="setting-item">
+          <label className="setting-checkbox">
+            <input
+              type="checkbox"
+              checked={autoCloseArchivedTabs}
+              onChange={(e) => setAutoCloseArchivedTabs(e.target.checked)}
+            />
+            <span>
+              <strong>Auto-Close Archived Tabs</strong>
+              <span className="setting-description">
+                Automatically close tabs when they are archived
               </span>
             </span>
           </label>
@@ -197,26 +247,83 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
                 <li>✅ Advanced filters</li>
                 <li>✅ Tags & Projects</li>
                 <li>✅ Export/Import</li>
-                <li>✅ Analytics</li>
               </ul>
+              <button onClick={handleCancelSubscription} className="btn-secondary" style={{ marginTop: '1rem' }}>
+                Cancel Subscription
+              </button>
             </>
           ) : (
             <>
-              <h3>Upgrade to Pro</h3>
-              <p className="price">$4.99/month or $49/year</p>
+              <h3>Upgrade to TabEcho Pro</h3>
+
+              {/* Country Selector */}
+              <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f3f4f6', borderRadius: '8px' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+                  Select your region:
+                </label>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    onClick={() => handleCountryChange('OTHER')}
+                    className={userCountry === 'OTHER' ? 'btn-primary' : 'btn-secondary'}
+                    style={{ flex: 1 }}
+                  >
+                    🌍 International (PayPal)
+                  </button>
+                  <button
+                    onClick={() => handleCountryChange('IN')}
+                    className={userCountry === 'IN' ? 'btn-primary' : 'btn-secondary'}
+                    style={{ flex: 1 }}
+                  >
+                    🇮🇳 India (Razorpay)
+                  </button>
+                </div>
+              </div>
+
+              {/* Pricing Display */}
+              <p className="price">
+                {paymentProvider === 'razorpay' ? (
+                  <>₹{PAYMENT_CONFIG.pricing.monthly.inr}/month or ₹{PAYMENT_CONFIG.pricing.yearly.inr}/year (save 17%)</>
+                ) : (
+                  <>${PAYMENT_CONFIG.pricing.monthly.usd}/month or ${PAYMENT_CONFIG.pricing.yearly.usd}/year (save 17%)</>
+                )}
+              </p>
+
               <ul className="feature-list">
                 <li>📸 Screenshot thumbnails</li>
                 <li>∞ Unlimited archive storage</li>
                 <li>🔍 Advanced search & filters</li>
                 <li>🏷️ Tags & Project organization</li>
-                <li>📊 Tab usage analytics</li>
                 <li>💾 Export/Import data</li>
               </ul>
-              <button onClick={handleUpgradeToPro} className="btn-upgrade">
-                Upgrade Now (Demo)
-              </button>
-              <p className="demo-note">
-                In production, this would open Stripe checkout
+
+              {/* Payment Buttons */}
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                <button
+                  onClick={() => handleUpgrade('monthly')}
+                  className="btn-upgrade"
+                  style={{ flex: 1 }}
+                >
+                  {paymentProvider === 'razorpay' ? '₹' : '$'}
+                  {paymentProvider === 'razorpay'
+                    ? PAYMENT_CONFIG.pricing.monthly.inr
+                    : PAYMENT_CONFIG.pricing.monthly.usd}
+                  /month
+                </button>
+                <button
+                  onClick={() => handleUpgrade('yearly')}
+                  className="btn-primary"
+                  style={{ flex: 1 }}
+                >
+                  {paymentProvider === 'razorpay' ? '₹' : '$'}
+                  {paymentProvider === 'razorpay'
+                    ? PAYMENT_CONFIG.pricing.yearly.inr
+                    : PAYMENT_CONFIG.pricing.yearly.usd}
+                  /year 💎
+                </button>
+              </div>
+
+              <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280', textAlign: 'center' }}>
+                Secure payment via {paymentProvider === 'razorpay' ? 'Razorpay' : 'PayPal'}
               </p>
             </>
           )}
@@ -276,13 +383,13 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
             TabEcho automatically archives your idle tabs so you never lose important content.
           </p>
           <p>
-            <a href="https://github.com/yourusername/tabecho" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/YOUR_USERNAME/tabecho-extension" target="_blank" rel="noopener noreferrer">
               GitHub
             </a>
             {' | '}
-            <a href="mailto:support@tabecho.com">Support</a>
+            <a href="mailto:YOUR_EMAIL@example.com">Support</a>
             {' | '}
-            <a href="https://tabecho.com/privacy" target="_blank" rel="noopener noreferrer">
+            <a href="https://YOUR_DOMAIN.com/privacy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
             </a>
           </p>

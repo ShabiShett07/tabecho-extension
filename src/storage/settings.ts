@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS: TabEchoSettings = {
   retentionLimit: 100, // Free tier: keep last 100 tabs
   retentionDays: 7, // Free tier: keep for 7 days
   autoArchive: true,
+  autoCloseArchivedTabs: false, // off by default
   domains: [], // domains to exclude from auto-archive
 };
 

@@ -7,7 +7,7 @@ export interface ArchivedTab {
   title: string;
   favIconUrl?: string;
   timestamp: number;
-  screenshot?: Blob;
+  screenshot?: Blob | string; // Blob in IndexedDB, data URL string when serialized
   tags: string[];
   project?: string;
   domain: string;
@@ -22,6 +22,7 @@ export interface TabEchoSettings {
   retentionLimit: number; // max number of archived tabs (Free tier limit)
   retentionDays: number; // max days to keep archived tabs (Free tier limit)
   autoArchive: boolean;
+  autoCloseArchivedTabs: boolean; // automatically close tabs when archived
   domains: string[]; // domains to exclude from auto-archive
 }
 
