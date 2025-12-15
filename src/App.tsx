@@ -61,7 +61,7 @@ function App() {
               <span className="global-toggle-slider"></span>
             </label>
             {!settings.isPro && (
-              <button className="upgrade-btn" onClick={() => setCurrentView('settings')}>
+              <button className="upgrade-btn" onClick={() => chrome.tabs.create({ url: 'https://tabecho.apptoolspro.com/payment' })}>
                 ⭐ Upgrade to Pro
               </button>
             )}

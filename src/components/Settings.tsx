@@ -2,14 +2,9 @@ import { useState, useEffect } from 'react'
 import type { TabEchoSettings } from '../storage/db'
 import { updateSettings } from '../storage/settings'
 import {
-  openPayPalCheckout,
-  openRazorpayCheckout,
   checkSubscriptionStatus,
   cancelSubscription,
-  getRecommendedProvider,
-  type PaymentProvider,
 } from '../services/payments'
-import { PAYMENT_CONFIG, detectUserCountry, saveUserCountry } from '../config/payments'
 import './Settings.css'
 
 interface SettingsProps {
@@ -24,8 +19,6 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
   const [autoCloseArchivedTabs, setAutoCloseArchivedTabs] = useState(settings.autoCloseArchivedTabs)
   const [excludedDomains, setExcludedDomains] = useState(settings.domains.join(', '))
   const [saving, setSaving] = useState(false)
-  const [paymentProvider, setPaymentProvider] = useState<PaymentProvider>('paypal')
-  const [userCountry, setUserCountry] = useState<'IN' | 'OTHER'>('OTHER')
 
   const handleSave = async () => {
     setSaving(true)
@@ -111,12 +104,6 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
     }
   }
 
-  const handleUpgrade = async (plan: 'monthly' | 'yearly') => {
-    // Redirect to AppToolsPro payment page with plan parameter
-    const paymentUrl = `https://tabecho.apptoolspro.com/payment?plan=${plan}`
-    chrome.tabs.create({ url: paymentUrl })
-  }
-
   const handleCancelSubscription = async () => {
     if (!confirm('Are you sure you want to cancel your subscription? You will lose access to Pro features.')) {
       return
@@ -132,21 +119,9 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
     }
   }
 
-  const handleCountryChange = async (country: 'IN' | 'OTHER') => {
-    setUserCountry(country)
-    await saveUserCountry(country)
-    setPaymentProvider(country === 'IN' ? 'razorpay' : 'paypal')
-  }
-
-  // Check subscription status and detect country on mount
+  // Check subscription status on mount
   useEffect(() => {
     checkSubscriptionStatus()
-
-    // Detect user country and set payment provider
-    detectUserCountry().then((country) => {
-      setUserCountry(country)
-      setPaymentProvider(country === 'IN' ? 'razorpay' : 'paypal')
-    })
   }, [])
 
   return (
@@ -248,68 +223,16 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
           ) : (
             <>
               <h3>Upgrade to TabEcho Pro</h3>
-
-              {/* Country Selector */}
-              <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f3f4f6', borderRadius: '8px' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-                  Select your region:
-                </label>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button
-                    onClick={() => handleCountryChange('OTHER')}
-                    className={userCountry === 'OTHER' ? 'btn-primary' : 'btn-secondary'}
-                    style={{ flex: 1 }}
-                  >
-                    🌍 International (PayPal)
-                  </button>
-                  <button
-                    onClick={() => handleCountryChange('IN')}
-                    className={userCountry === 'IN' ? 'btn-primary' : 'btn-secondary'}
-                    style={{ flex: 1 }}
-                  >
-                    🇮🇳 India (Razorpay)
-                  </button>
-                </div>
-              </div>
-
-              {/* Pricing Display */}
-              <p className="price">
-                {paymentProvider === 'razorpay' ? (
-                  <>₹{PAYMENT_CONFIG.pricing.monthly.inr}/month or ₹{PAYMENT_CONFIG.pricing.yearly.inr}/year (save 17%)</>
-                ) : (
-                  <>${PAYMENT_CONFIG.pricing.monthly.usd}/month or ${PAYMENT_CONFIG.pricing.yearly.usd}/year (save 17%)</>
-                )}
+              <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
+                Unlock all premium features including unlimited storage, screenshots, advanced search, and more.
               </p>
-
-              <ul className="feature-list">
-                <li>📸 Screenshot thumbnails</li>
-                <li>∞ Unlimited archive storage</li>
-                <li>🔍 Advanced search & filters</li>
-                <li>🏷️ Tags & Project organization</li>
-                <li>💾 Export/Import data</li>
-              </ul>
-
-              {/* Payment Buttons */}
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                <button
-                  onClick={() => handleUpgrade('monthly')}
-                  className="btn-upgrade"
-                  style={{ flex: 1 }}
-                >
-                  Upgrade - Monthly
-                </button>
-                <button
-                  onClick={() => handleUpgrade('yearly')}
-                  className="btn-primary"
-                  style={{ flex: 1 }}
-                >
-                  Upgrade - Yearly 💎
-                </button>
-              </div>
-
-              <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280', textAlign: 'center' }}>
-                Secure checkout on apptoolspro.com
-              </p>
+              <button
+                onClick={() => chrome.tabs.create({ url: 'https://tabecho.apptoolspro.com/payment' })}
+                className="btn-primary"
+                style={{ width: '100%', padding: '1rem' }}
+              >
+                ⭐ Upgrade to Pro
+              </button>
             </>
           )}
         </div>
