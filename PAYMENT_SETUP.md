@@ -54,7 +54,7 @@ TabEcho uses **PayPal** for international customers and **Razorpay** for Indian 
 
 1. Go to https://developer.paypal.com/dashboard/webhooks
 2. Click **"Add Webhook"**
-3. **Webhook URL**: `https://YOUR_PROJECT.cloudfunctions.net/paypalWebhook`
+3. **Webhook URL**: `https://YOUR_PROJECT.vercel.app/api/paypal-webhook`
 4. **Event types** - Select:
    - `BILLING.SUBSCRIPTION.ACTIVATED`
    - `BILLING.SUBSCRIPTION.CANCELLED`
@@ -98,7 +98,7 @@ TabEcho uses **PayPal** for international customers and **Razorpay** for Indian 
 
 **Yearly Plan:**
 - **Plan Name**: TabEcho Pro Yearly
-- **Description**: Yearly subscription (save 17%)
+- **Description**: 
 - **Billing Amount**: ₹3999
 - **Billing Interval**: Yearly (every 12 months)
 - **Plan Type**: Regular
