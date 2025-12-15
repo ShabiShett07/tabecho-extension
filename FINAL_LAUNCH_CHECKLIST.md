@@ -16,17 +16,17 @@
 
 Follow `STRIPE_SETUP.md` to:
 
-- [ ] Create Stripe account
-- [ ] Create two products (Monthly $4.99, Yearly $49)
-- [ ] Get API keys
-- [ ] Deploy Firebase Functions backend
-- [ ] Configure webhook
-- [ ] Test with Stripe test cards
-- [ ] Update `.env` file with your Stripe keys
+- [ ] Create PayPal Business account
+- [ ] Create Razorpay account
+- [ ] Create subscription plans on both platforms
+- [ ] Deploy Vercel backend
+- [ ] Configure webhooks for both PayPal and Razorpay
+- [ ] Test with test cards/accounts
+- [ ] Update `.env` file with your API keys
 
 **Files to configure:**
 - `.env` (copy from `.env.example` and fill in)
-- Firebase Functions (deploy backend)
+- Vercel backend (deploy from GitHub)
 
 ### 2. Update Placeholder URLs
 
@@ -267,8 +267,8 @@ Privacy Policy: [YOUR_PRIVACY_POLICY_URL]
 
 1. **Monitor:**
    - Chrome Web Store reviews
-   - Stripe Dashboard for subscriptions
-   - Firebase logs for errors
+   - PayPal & Razorpay Dashboards for subscriptions
+   - Vercel logs for errors
 
 2. **Promote:**
    - Share on Twitter, Reddit, ProductHunt

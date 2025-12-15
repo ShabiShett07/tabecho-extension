@@ -1,156 +1,259 @@
 # TabEcho Backend API
 
-This folder contains serverless functions needed for Stripe integration.
+This folder contains the Vercel serverless backend for TabEcho's payment integration.
 
 ## Why You Need a Backend
 
-Chrome extensions can't directly handle Stripe webhooks or securely manage API keys. You need a backend to:
+Chrome extensions can't directly handle payment webhooks or securely manage API secrets. You need a backend to:
 
-1. **Create Checkout Sessions** - Securely create Stripe checkout URLs
-2. **Handle Webhooks** - Receive notifications when subscriptions change
-3. **Verify Subscriptions** - Check if a user has an active subscription
+1. **Handle Webhooks** - Receive notifications when subscriptions change (PayPal & Razorpay)
+2. **Verify Subscriptions** - Check if a user has an active subscription
+3. **Create Subscriptions** - Securely create Razorpay subscriptions
 4. **Store Subscription Data** - Keep track of which extension users are subscribed
+5. **Cancel Subscriptions** - Handle subscription cancellations
 
-## Backend Options
+## Backend Architecture
 
-### Option 1: Firebase Functions (Recommended)
-- **Pros:** Easy setup, generous free tier, integrated database
-- **Cons:** Requires Firebase project
-- **Cost:** Free for most extensions, ~$5/month if you scale
-- **Setup Time:** 15-30 minutes
+**Platform:** Vercel Serverless Functions
+**Payment Providers:**
+- **PayPal** - International customers (USD)
+- **Razorpay** - Indian customers (INR)
 
-### Option 2: Vercel Serverless Functions
-- **Pros:** Very easy deployment, great DX, fast
-- **Cons:** Need separate database
-- **Cost:** Free for hobby projects
-- **Setup Time:** 15-30 minutes
+**API Endpoints:**
+- `/api/paypal-webhook` - Handle PayPal subscription events
+- `/api/razorpay-webhook` - Handle Razorpay subscription events
+- `/api/check-subscription` - Verify user subscription status
+- `/api/create-razorpay-subscription` - Create new Razorpay subscription
+- `/api/cancel-subscription` - Cancel user subscription
 
-### Option 3: Railway / Render
-- **Pros:** Simple, can run Node.js servers
-- **Cons:** Less generous free tier
-- **Cost:** $5-10/month minimum
+## Quick Start
 
-## Quick Start with Firebase (Recommended)
+### 1. Push to GitHub
 
-### 1. Install Firebase CLI
 ```bash
-npm install -g firebase-tools
-firebase login
+git add .
+git commit -m "Add Vercel backend"
+git push origin main
 ```
 
-### 2. Initialize Firebase
-```bash
-cd backend/firebase
-firebase init functions
-```
+### 2. Deploy to Vercel
 
-### 3. Install Dependencies
-```bash
-cd functions
-npm install stripe
-```
+1. Go to https://vercel.com/new
+2. Click **"Import Git Repository"**
+3. Connect GitHub and select your repository
+4. Click **"Import"**
 
-### 4. Set Environment Variables
-```bash
-firebase functions:config:set stripe.secret_key="sk_test_YOUR_KEY"
-firebase functions:config:set stripe.webhook_secret="whsec_YOUR_SECRET"
+### 3. Configure Project
+
+- **Project Name**: `tabecho-backend`
+- **Framework Preset**: Other
+- **Root Directory**: `backend/vercel`
+- **Build Settings**: Leave empty
+
+### 4. Add Environment Variables
+
+In Vercel Dashboard → Settings → Environment Variables:
+
+```env
+# PayPal
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_secret
+PAYPAL_MODE=sandbox  # or "live" for production
+
+# Razorpay
+RAZORPAY_KEY_ID=rzp_test_your_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ### 5. Deploy
-```bash
-firebase deploy --only functions
+
+Click **"Deploy"** and wait for completion (~1-2 minutes)
+
+Your backend will be live at: `https://your-project.vercel.app`
+
+### 6. Configure Webhooks
+
+**PayPal:**
+1. Go to https://developer.paypal.com/dashboard/webhooks
+2. Add webhook: `https://your-project.vercel.app/api/paypal-webhook`
+3. Select events: `BILLING.SUBSCRIPTION.*`, `PAYMENT.SALE.COMPLETED`
+
+**Razorpay:**
+1. Go to https://dashboard.razorpay.com/app/webhooks
+2. Add webhook: `https://your-project.vercel.app/api/razorpay-webhook`
+3. Select events: `subscription.*`
+4. Copy webhook secret and add to Vercel environment variables
+
+### 7. Update Extension
+
+Update your extension's `.env` file:
+
+```env
+VITE_API_URL=https://your-project.vercel.app
 ```
-
-### 6. Configure Stripe Webhook
-1. Go to https://dashboard.stripe.com/webhooks
-2. Add endpoint: `https://YOUR_PROJECT.cloudfunctions.net/webhook`
-3. Select events: `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
-4. Copy webhook secret and update config
-
-### 7. Update Extension Config
-Update `src/config/stripe.ts` with your deployed function URLs.
-
-## Quick Start with Vercel
-
-### 1. Install Vercel CLI
-```bash
-npm install -g vercel
-```
-
-### 2. Deploy
-```bash
-cd backend/vercel
-vercel
-```
-
-### 3. Add Environment Variables
-In Vercel Dashboard, add:
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `UPSTASH_REDIS_URL` (for storing subscriptions)
-
-### 4. Configure Stripe Webhook
-Same as Firebase option above, but use your Vercel URL.
-
-## Database for Storing Subscriptions
-
-You need to store which extension users have active subscriptions.
-
-### Option 1: Firestore (with Firebase Functions)
-Already included in Firebase - no extra setup needed.
-
-### Option 2: Upstash Redis (with Vercel)
-- Free tier: 10,000 requests/day
-- Setup: https://upstash.com/
-- Just need the Redis URL
-
-### Option 3: Supabase
-- Free PostgreSQL database
-- 500MB storage on free tier
-- Setup: https://supabase.com/
 
 ## Cost Estimates
 
-### Small Extension (< 1,000 users)
-- Firebase: **Free** (within free tier)
-- Vercel + Upstash: **Free**
-- Stripe fees: 2.9% + 30¢ per transaction
+### Vercel Costs
 
-### Medium Extension (1,000 - 10,000 users)
-- Firebase: **$5-10/month**
-- Vercel + Upstash: **Free** (still within limits)
-- Stripe fees: 2.9% + 30¢ per transaction
+**Hobby Plan (Free):**
+- 100GB bandwidth/month
+- 100 function executions/day
+- Perfect for small to medium extensions
 
-### Large Extension (10,000+ users)
-- Firebase: **$25-50/month**
-- Vercel + Upstash: **$10-20/month**
-- Stripe fees: 2.9% + 30¢ per transaction
+**Pro Plan ($20/month):**
+- 1TB bandwidth/month
+- Unlimited function executions
+- Recommended for 500+ active subscribers
+
+### Payment Provider Fees
+
+**PayPal:**
+- 2.9% + $0.30 per transaction
+- Monthly ($4.99): ~$0.44 fee
+- Yearly ($49): ~$1.72 fee
+
+**Razorpay:**
+- 2% per transaction
+- Monthly (₹399): ~₹8 fee
+- Yearly (₹3999): ~₹80 fee
+
+## Data Storage
+
+The current implementation uses **in-memory storage** (Map) for simplicity. For production, upgrade to:
+
+### Recommended: Vercel KV (Redis)
+
+**Pros:**
+- Serverless Redis
+- Free tier: 30MB storage
+- Seamless Vercel integration
+- No cold starts
+
+**Setup:**
+1. Go to Vercel Dashboard → Storage → Create Database → KV
+2. Link to your project
+3. Vercel will auto-inject `KV_*` environment variables
+4. Update API functions to use KV instead of Map
+
+**Example:**
+```javascript
+import { kv } from '@vercel/kv';
+
+// Instead of: subscriptions.set(userId, data)
+await kv.set(`subscription:${userId}`, data);
+
+// Instead of: subscriptions.get(userId)
+const data = await kv.get(`subscription:${userId}`);
+```
+
+### Alternative: Upstash Redis
+
+**Pros:**
+- Free tier: 10,000 requests/day
+- Works with any platform
+- Simple REST API
+
+**Setup:**
+1. Create account at https://upstash.com
+2. Create Redis database
+3. Add `UPSTASH_REDIS_URL` to Vercel environment variables
 
 ## Security Checklist
 
-- [ ] Never expose Stripe secret key in extension code
-- [ ] Always verify webhook signatures
-- [ ] Use HTTPS for all API endpoints
-- [ ] Validate user inputs on backend
-- [ ] Rate limit API endpoints
-- [ ] Log all subscription events
-- [ ] Handle failed payments gracefully
+Before going live:
+
+- [ ] PayPal Client Secret never exposed in frontend
+- [ ] Razorpay Key Secret never exposed in frontend
+- [ ] Webhook signatures verified properly
+- [ ] All API endpoints use HTTPS
+- [ ] Environment variables stored securely in Vercel
+- [ ] Test mode keys replaced with live keys
+- [ ] Webhook URLs use production deployment
 
 ## Testing
 
-1. Use Stripe test mode keys during development
-2. Test checkout flow end-to-end
-3. Test webhook delivery with Stripe CLI:
-   ```bash
-   stripe listen --forward-to localhost:5001/PROJECT/us-central1/webhook
-   stripe trigger customer.subscription.created
-   ```
-4. Test subscription verification
-5. Test expired subscriptions
+### Local Testing
 
-## Support
+```bash
+cd backend/vercel
+npm install
+vercel dev
+```
 
-For issues with:
-- **Stripe setup:** https://stripe.com/docs
-- **Firebase:** https://firebase.google.com/support
-- **Vercel:** https://vercel.com/support
+Your API will be available at `http://localhost:3000/api/*`
+
+### Test PayPal Webhook
+
+Use PayPal Sandbox:
+1. Create test subscription
+2. Monitor Vercel logs for webhook events
+3. Verify subscription status updates
+
+### Test Razorpay Webhook
+
+Use Razorpay Test Mode:
+1. Create test subscription with test card
+2. Check Vercel logs for webhook delivery
+3. Verify subscription activation
+
+## Monitoring
+
+**View Logs:**
+- Vercel Dashboard → Project → Logs
+- Filter by function name
+- Real-time log streaming
+
+**Monitor Performance:**
+- Vercel Analytics (Pro plan)
+- Function execution time
+- Error rates
+
+## Deployment
+
+**Automatic Deployments:**
+- Push to `main` → Auto-deploy to production
+- Push to feature branch → Preview deployment
+- Pull requests → Preview deployment with URL
+
+**Manual Deployment:**
+```bash
+cd backend/vercel
+vercel --prod
+```
+
+## Troubleshooting
+
+**Webhooks not received:**
+- Check Vercel logs for errors
+- Verify webhook URL is correct
+- Test webhook in PayPal/Razorpay dashboard
+
+**Subscription not updating:**
+- Check webhook signature verification
+- Verify environment variables
+- Monitor Vercel function logs
+
+**Function errors:**
+- Check Vercel deployment logs
+- Verify all dependencies installed
+- Test locally with `vercel dev`
+
+## Support Resources
+
+- **Vercel Documentation**: https://vercel.com/docs
+- **PayPal Developer Docs**: https://developer.paypal.com/docs
+- **Razorpay Documentation**: https://razorpay.com/docs
+
+## GitHub Integration
+
+Once connected to GitHub:
+- ✅ Auto-deploy on git push
+- ✅ Preview deployments for PRs
+- ✅ Rollback to previous deployments
+- ✅ Environment variables per branch
+
+---
+
+**For detailed payment setup, see [PAYMENT_SETUP.md](../PAYMENT_SETUP.md)**

@@ -109,7 +109,7 @@ TabEcho uses **PayPal** for international customers and **Razorpay** for Indian 
 
 1. Go to https://dashboard.razorpay.com/app/webhooks
 2. Click **"Create New Webhook"**
-3. **Webhook URL**: `https://YOUR_PROJECT.cloudfunctions.net/razorpayWebhook`
+3. **Webhook URL**: `https://YOUR_PROJECT.vercel.app/api/razorpay-webhook`
 4. **Active Events** - Select:
    - `subscription.activated`
    - `subscription.cancelled`
@@ -121,74 +121,70 @@ TabEcho uses **PayPal** for international customers and **Razorpay** for Indian 
 
 ---
 
-## Part 3: Firebase Backend Setup
+## Part 3: Vercel Backend Setup
 
-### Step 1: Install Firebase CLI
+### Step 1: Push Code to GitHub
 
 ```bash
-npm install -g firebase-tools
-firebase login
+# If not already done
+git add .
+git commit -m "Add Vercel backend"
+git push origin main
 ```
 
-### Step 2: Create Firebase Project
+### Step 2: Deploy to Vercel
 
-1. Go to https://console.firebase.google.com
-2. Click **"Add project"**
-3. Name it: **"tabecho-pro"**
-4. Disable Google Analytics (optional)
-5. Click **"Create project"**
+1. Go to https://vercel.com/new
+2. Click **"Import Git Repository"**
+3. Connect your GitHub account if needed
+4. Select repository: **`YOUR_USERNAME/tabecho-extension`**
+5. Click **"Import"**
 
-### Step 3: Initialize Firebase Functions
+### Step 3: Configure Project Settings
 
-```bash
-cd backend/firebase
-firebase init functions
+**Project Name**: `tabecho-backend` (or your choice)
 
-# Select:
-# - Use existing project → select "tabecho-pro"
-# - Language: JavaScript
-# - ESLint: Yes
-# - Install dependencies: Yes
-```
+**Framework Preset**: Other
 
-### Step 4: Install Dependencies
+**Root Directory**:
+- Click **"Edit"**
+- Enter: `backend/vercel`
+- Check: ✓ **"Include source files outside of the Root Directory"**
 
-```bash
-cd functions
-npm install
-```
+**Build Settings**: Leave empty (using serverless functions)
 
-### Step 5: Configure Environment Variables
+### Step 4: Add Environment Variables
 
-```bash
+In Vercel dashboard, add these environment variables:
+
+```env
 # PayPal Configuration
-firebase functions:config:set paypal.client_id="YOUR_PAYPAL_CLIENT_ID"
-firebase functions:config:set paypal.secret="YOUR_PAYPAL_SECRET"
-firebase functions:config:set paypal.mode="sandbox"  # or "live" for production
+PAYPAL_CLIENT_ID=YOUR_PAYPAL_CLIENT_ID
+PAYPAL_CLIENT_SECRET=YOUR_PAYPAL_SECRET
+PAYPAL_MODE=sandbox
 
 # Razorpay Configuration
-firebase functions:config:set razorpay.key_id="rzp_test_YOUR_KEY_ID"
-firebase functions:config:set razorpay.key_secret="YOUR_RAZORPAY_SECRET"
-firebase functions:config:set razorpay.webhook_secret="YOUR_WEBHOOK_SECRET"
+RAZORPAY_KEY_ID=rzp_test_YOUR_KEY_ID
+RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_SECRET
+RAZORPAY_WEBHOOK_SECRET=YOUR_WEBHOOK_SECRET
 ```
 
-### Step 6: Deploy Functions
+### Step 5: Deploy
 
-```bash
-firebase deploy --only functions
-```
+Click **"Deploy"** and wait for deployment to complete (~1-2 minutes)
 
-You'll get URLs like:
-- `https://YOUR_PROJECT.cloudfunctions.net/verifyPayPalSubscription`
-- `https://YOUR_PROJECT.cloudfunctions.net/paypalWebhook`
-- `https://YOUR_PROJECT.cloudfunctions.net/createRazorpaySubscription`
-- `https://YOUR_PROJECT.cloudfunctions.net/razorpayWebhook`
-- `https://YOUR_PROJECT.cloudfunctions.net/checkSubscription`
-- `https://YOUR_PROJECT.cloudfunctions.net/cancelSubscription`
+You'll get a URL like: `https://your-project.vercel.app`
 
-### Step 7: Update Webhook URLs
+Your API endpoints will be:
+- `https://your-project.vercel.app/api/paypal-webhook`
+- `https://your-project.vercel.app/api/razorpay-webhook`
+- `https://your-project.vercel.app/api/check-subscription`
+- `https://your-project.vercel.app/api/create-razorpay-subscription`
+- `https://your-project.vercel.app/api/cancel-subscription`
 
-Go back to PayPal and Razorpay dashboards and update webhook URLs with your deployed function URLs.
+### Step 6: Update Webhook URLs
+
+Go back to PayPal and Razorpay dashboards and update webhook URLs with your Vercel deployment URL.
 
 ---
 
@@ -214,7 +210,7 @@ VITE_RAZORPAY_PLAN_MONTHLY=plan_YOUR_MONTHLY_PLAN_ID
 VITE_RAZORPAY_PLAN_YEARLY=plan_YOUR_YEARLY_PLAN_ID
 
 # Backend API
-VITE_API_URL=https://YOUR_PROJECT.cloudfunctions.net
+VITE_API_URL=https://YOUR_PROJECT.vercel.app
 ```
 
 ### Step 3: Build Extension
@@ -255,7 +251,7 @@ npm run build
 1. After payment, wait 5-10 seconds
 2. Extension should automatically detect Pro status
 3. Verify Pro features are unlocked
-4. Check Firebase Firestore for user subscription data
+4. Check Vercel logs for subscription data
 
 ---
 
@@ -269,12 +265,12 @@ npm run build
 4. Switch from Sandbox to Live mode
 5. Create **Live** subscription plans
 6. Update `.env` with **Live** Client ID and Plan IDs
-7. Update Firebase config:
-   ```bash
-   firebase functions:config:set paypal.mode="live"
-   firebase functions:config:set paypal.client_id="LIVE_CLIENT_ID"
-   firebase functions:config:set paypal.secret="LIVE_SECRET"
-   ```
+7. Update Vercel environment variables:
+   - Go to Vercel Dashboard → Project Settings → Environment Variables
+   - Update `PAYPAL_MODE` to `live`
+   - Update `PAYPAL_CLIENT_ID` to live client ID
+   - Update `PAYPAL_CLIENT_SECRET` to live secret
+   - Redeploy will trigger automatically
 
 ### Razorpay - Switch to Live
 
@@ -282,11 +278,11 @@ npm run build
 2. Get Live Mode API keys
 3. Create **Live** subscription plans
 4. Update `.env` with **Live** Key ID and Plan IDs
-5. Update Firebase config:
-   ```bash
-   firebase functions:config:set razorpay.key_id="rzp_live_YOUR_KEY"
-   firebase functions:config:set razorpay.key_secret="LIVE_SECRET"
-   ```
+5. Update Vercel environment variables:
+   - Go to Vercel Dashboard → Project Settings → Environment Variables
+   - Update `RAZORPAY_KEY_ID` to live key ID
+   - Update `RAZORPAY_KEY_SECRET` to live secret
+   - Redeploy will trigger automatically
 
 ### Redeploy
 
@@ -294,9 +290,8 @@ npm run build
 # Rebuild extension
 npm run build
 
-# Redeploy Firebase Functions
-cd backend/firebase
-firebase deploy --only functions
+# Vercel redeploys automatically on git push
+# Or manually redeploy from Vercel dashboard
 ```
 
 ---
@@ -315,15 +310,17 @@ firebase deploy --only functions
 - Monthly (₹399): ~₹8 per subscription
 - Yearly (₹3999): ~₹80 per subscription
 
-### Firebase Costs
+### Vercel Costs
 
-**Free Tier (Spark Plan):**
-- 125K function invocations/month
-- Free for most small extensions
+**Free Tier (Hobby Plan):**
+- 100GB bandwidth/month
+- 100 serverless function executions/day
+- **FREE** for most small extensions
 
-**Paid (Blaze Plan):**
-- With 100 subscribers: ~$0-5/month
-- With 1,000 subscribers: ~$25-50/month
+**Pro Plan ($20/month):**
+- 1TB bandwidth/month
+- Unlimited serverless function executions
+- Recommended for 500+ subscribers
 
 ---
 
@@ -337,9 +334,9 @@ firebase deploy --only functions
 - Check CORS settings
 
 **Subscription not activating**
-- Check Firebase Functions logs: `firebase functions:log`
+- Check Vercel function logs in dashboard
 - Verify webhook is configured correctly
-- Check Firestore for user document
+- Check Vercel deployment logs
 
 ### Razorpay Issues
 
@@ -351,15 +348,15 @@ firebase deploy --only functions
 **Payment verification failed**
 - Check webhook secret matches
 - Verify signature generation logic
-- Check Firebase logs
+- Check Vercel logs
 
 ### General Issues
 
 **Subscription status not updating**
 - Check webhooks are configured correctly
-- Verify Firebase Functions are deployed
-- Check Firestore security rules
-- Monitor Firebase Functions logs
+- Verify Vercel deployment is live
+- Check Vercel environment variables
+- Monitor Vercel function logs in dashboard
 
 ---
 
@@ -371,9 +368,9 @@ Before going live:
 - [ ] Razorpay Key Secret never exposed in frontend
 - [ ] Webhook signatures verified properly
 - [ ] All API endpoints use HTTPS
-- [ ] Firestore security rules configured
+- [ ] Vercel environment variables are secure
 - [ ] Test mode keys replaced with live keys
-- [ ] Webhook URLs use deployed functions (not localhost)
+- [ ] Webhook URLs use Vercel deployment (not localhost)
 
 ---
 
@@ -381,7 +378,7 @@ Before going live:
 
 - **PayPal Documentation**: https://developer.paypal.com/docs/subscriptions/
 - **Razorpay Documentation**: https://razorpay.com/docs/payments/subscriptions/
-- **Firebase Documentation**: https://firebase.google.com/docs/functions
+- **Vercel Documentation**: https://vercel.com/docs/functions/serverless-functions
 
 ---
 
@@ -397,4 +394,4 @@ After payments are working:
 
 ---
 
-**Need help?** Check Firebase Functions logs with `firebase functions:log`
+**Need help?** Check Vercel function logs in the Vercel dashboard

@@ -128,17 +128,20 @@ npm run preview
 3. Click "Reload" on extension in `chrome://extensions/`
 4. Test changes in the extension popup
 
-## 💳 Monetization (Future)
+## 💳 Monetization
 
-The extension includes placeholder code for Stripe integration:
+The extension includes full payment integration with PayPal and Razorpay:
 
-1. **Set up Stripe** account and products
-2. **Create backend** (Firebase Functions, Supabase, or Node.js)
-3. **Implement webhooks** for subscription events
-4. **Add verification** to check subscription status
-5. **Update extension** to call your backend API
+1. **PayPal** - For international customers (USD)
+2. **Razorpay** - For Indian customers (INR)
+3. **Vercel Backend** - Serverless API for handling payments
+4. **Automatic detection** - Extension detects user location
 
-See `README_SETUP.md` for detailed implementation guide.
+**Pricing:**
+- Monthly: $4.99/month (USD) or ₹399/month (INR)
+- Yearly: $49/year (USD) or ₹3999/year (INR)
+
+See `PAYMENT_SETUP.md` for detailed setup guide.
 
 ## 🔒 Privacy & Permissions
 

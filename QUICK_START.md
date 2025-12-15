@@ -173,7 +173,7 @@ Want to add these features yourself?
    - Customer portal for billing management
 
 2. **Cloud Sync** (Enterprise) - Cross-device synchronization
-   - Firebase/Supabase integration
+   - Cloud database integration
    - Multi-device archive access
    - Team collaboration features
 

@@ -113,7 +113,7 @@ When we implement paid Pro subscriptions via Stripe:
 ### Enterprise Tier (Optional Cloud Sync)
 If you're an Enterprise user who opts into cloud sync:
 
-- Data will be synced to **Firebase** or **Supabase** (specified in Enterprise agreement)
+- Data will be synced to a **secure cloud database** (specified in Enterprise agreement)
 - Synced data is encrypted in transit and at rest
 - You can disable cloud sync at any time
 - Cloud data is isolated per team/organization
