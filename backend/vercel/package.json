@@ -1,0 +1,17 @@
+{
+  "name": "tabecho-backend",
+  "version": "1.0.0",
+  "description": "Vercel backend for TabEcho payment integration",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
+    "razorpay": "^2.9.4",
+    "crypto": "^1.0.1"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.11"
+  }
+}
