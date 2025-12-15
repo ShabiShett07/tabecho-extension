@@ -112,16 +112,9 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
   }
 
   const handleUpgrade = async (plan: 'monthly' | 'yearly') => {
-    try {
-      if (paymentProvider === 'razorpay') {
-        await openRazorpayCheckout(plan)
-      } else {
-        await openPayPalCheckout(plan)
-      }
-    } catch (error) {
-      console.error('Error opening checkout:', error)
-      alert('Failed to open checkout. Please try again.')
-    }
+    // Redirect to AppToolsPro payment page with plan parameter
+    const paymentUrl = `https://tabecho.apptoolspro.com/payment?plan=${plan}`
+    chrome.tabs.create({ url: paymentUrl })
   }
 
   const handleCancelSubscription = async () => {
@@ -303,27 +296,19 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
                   className="btn-upgrade"
                   style={{ flex: 1 }}
                 >
-                  {paymentProvider === 'razorpay' ? '₹' : '$'}
-                  {paymentProvider === 'razorpay'
-                    ? PAYMENT_CONFIG.pricing.monthly.inr
-                    : PAYMENT_CONFIG.pricing.monthly.usd}
-                  /month
+                  Upgrade - Monthly
                 </button>
                 <button
                   onClick={() => handleUpgrade('yearly')}
                   className="btn-primary"
                   style={{ flex: 1 }}
                 >
-                  {paymentProvider === 'razorpay' ? '₹' : '$'}
-                  {paymentProvider === 'razorpay'
-                    ? PAYMENT_CONFIG.pricing.yearly.inr
-                    : PAYMENT_CONFIG.pricing.yearly.usd}
-                  /year 💎
+                  Upgrade - Yearly 💎
                 </button>
               </div>
 
               <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280', textAlign: 'center' }}>
-                Secure payment via {paymentProvider === 'razorpay' ? 'Razorpay' : 'PayPal'}
+                Secure checkout on apptoolspro.com
               </p>
             </>
           )}
