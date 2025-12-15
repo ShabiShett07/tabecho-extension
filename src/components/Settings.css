@@ -52,8 +52,8 @@
 
 .setting-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #E63946;
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
 }
 
 .setting-input:disabled,
@@ -94,12 +94,12 @@
 
 .setting-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #E63946;
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
 }
 
 .subscription-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #E63946 0%, #c42b38 100%);
   color: white;
   padding: 2rem;
   border-radius: 12px;
@@ -108,7 +108,7 @@
 
 .pro-badge-large {
   display: inline-block;
-  background: #ffd700;
+  background: #1D7874;
   color: #333;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -146,7 +146,7 @@
 }
 
 .btn-upgrade {
-  background: #ffd700;
+  background: #1D7874;
   color: #333;
   border: none;
   padding: 1rem 2rem;
@@ -219,7 +219,7 @@
 }
 
 .about a {
-  color: #667eea;
+  color: #E63946;
   text-decoration: none;
 }
 

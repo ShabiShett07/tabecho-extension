@@ -92,7 +92,7 @@
 }
 
 .tab-url {
-  color: #667eea;
+  color: #E63946;
   font-size: 0.875rem;
   text-decoration: none;
   overflow: hidden;
@@ -132,7 +132,7 @@
 
 .tag {
   background: #e0e7ff;
-  color: #667eea;
+  color: #E63946;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -158,8 +158,8 @@
 
 .edit-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #E63946;
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
 }
 
 .edit-actions {
@@ -230,8 +230,8 @@
 
 .btn-restore:hover {
   background: #dbeafe;
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #E63946;
+  color: #E63946;
 }
 
 .btn-edit:hover {

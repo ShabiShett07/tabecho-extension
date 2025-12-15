@@ -30,7 +30,7 @@
 }
 
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #E63946 0%, #c42b38 100%);
   color: white;
   padding: 1rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -107,13 +107,13 @@
 }
 
 .global-toggle input:checked + .global-toggle-slider {
-  background-color: rgba(102, 230, 120, 0.4);
-  border-color: #66e678;
+  background-color: rgba(29, 120, 116, 0.4);
+  border-color: #1D7874;
 }
 
 .global-toggle input:checked + .global-toggle-slider:before {
   transform: translateX(22px);
-  background-color: #66e678;
+  background-color: #1D7874;
 }
 
 .global-toggle input:focus + .global-toggle-slider {
@@ -125,8 +125,8 @@
 }
 
 .upgrade-btn {
-  background: #ffd700;
-  color: #333;
+  background: #1D7874;
+  color: #FFFFFF;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -136,7 +136,7 @@
 }
 
 .upgrade-btn:hover {
-  background: #ffed4e;
+  background: #156460;
   transform: translateY(-1px);
 }
 
@@ -157,7 +157,7 @@
 
 .nav-btn.active {
   background: white;
-  color: #667eea;
+  color: #E63946;
 }
 
 .app-main {
@@ -179,7 +179,7 @@
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
+  border-top: 4px solid #E63946;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -191,7 +191,7 @@
 
 /* Common button styles */
 .btn-primary {
-  background: #667eea;
+  background: #E63946;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -202,9 +202,9 @@
 }
 
 .btn-primary:hover {
-  background: #5568d3;
+  background: #c42b38;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
 }
 
 .btn-primary:disabled {
@@ -214,8 +214,8 @@
 }
 
 .btn-secondary {
-  background: #e0e7ff;
-  color: #667eea;
+  background: #d4f1f0;
+  color: #1D7874;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -225,7 +225,7 @@
 }
 
 .btn-secondary:hover {
-  background: #c7d2fe;
+  background: #b8e6e4;
 }
 
 .btn-secondary:disabled {
@@ -253,8 +253,8 @@
 
 .pro-badge-inline {
   display: inline-block;
-  background: #ffd700;
-  color: #333;
+  background: #1D7874;
+  color: #FFFFFF;
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
