@@ -30,7 +30,7 @@
 }
 
 .app-header {
-  background: linear-gradient(135deg, #E63946 0%, #c42b38 100%);
+  background: linear-gradient(135deg, #E63946 0%, #1D7874 100%);
   color: white;
   padding: 1rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -125,7 +125,7 @@
 }
 
 .upgrade-btn {
-  background: linear-gradient(135deg, #1D7874 0%, #156460 100%);
+  background: linear-gradient(135deg, #1D7874 0%, #E63946 100%);
   color: #FFFFFF;
   border: none;
   padding: 0.5rem 1rem;
@@ -136,7 +136,7 @@
 }
 
 .upgrade-btn:hover {
-  background: linear-gradient(135deg, #156460 0%, #0f4c49 100%);
+  background: linear-gradient(135deg, #E63946 0%, #1D7874 100%);
   transform: translateY(-1px);
 }
 
@@ -191,7 +191,7 @@
 
 /* Common button styles */
 .btn-primary {
-  background: linear-gradient(135deg, #E63946 0%, #c42b38 100%);
+  background: linear-gradient(135deg, #E63946 0%, #1D7874 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -202,7 +202,7 @@
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #c42b38 0%, #a01f2a 100%);
+  background: linear-gradient(135deg, #1D7874 0%, #E63946 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
 }
@@ -214,8 +214,8 @@
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #d4f1f0 0%, #b8e6e4 100%);
-  color: #1D7874;
+  background: linear-gradient(135deg, #FFFFFF 0%, #1D7874 50%, #E63946 100%);
+  color: #333;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -225,7 +225,8 @@
 }
 
 .btn-secondary:hover {
-  background: linear-gradient(135deg, #b8e6e4 0%, #9cd9d6 100%);
+  background: linear-gradient(135deg, #E63946 0%, #1D7874 50%, #FFFFFF 100%);
+  color: #333;
 }
 
 .btn-secondary:disabled {
@@ -253,7 +254,7 @@
 
 .pro-badge-inline {
   display: inline-block;
-  background: linear-gradient(135deg, #1D7874 0%, #156460 100%);
+  background: linear-gradient(135deg, #1D7874 0%, #E63946 100%);
   color: #FFFFFF;
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
