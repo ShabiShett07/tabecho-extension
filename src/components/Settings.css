@@ -108,8 +108,8 @@
 
 .pro-badge-large {
   display: inline-block;
-  background: #1D7874;
-  color: #333;
+  background: linear-gradient(135deg, #1D7874 0%, #156460 100%);
+  color: #FFFFFF;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 1.25rem;
@@ -146,8 +146,8 @@
 }
 
 .btn-upgrade {
-  background: #1D7874;
-  color: #333;
+  background: linear-gradient(135deg, #1D7874 0%, #156460 100%);
+  color: #FFFFFF;
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
