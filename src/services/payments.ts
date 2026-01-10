@@ -224,24 +224,38 @@ async function verifyRazorpayPayment(
 }
 
 /**
- * Check subscription status from backend
+ * Check subscription status from AppToolsPro API
  */
-export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
+export async function checkSubscription(userId: string): Promise<boolean> {
   try {
-    const userId = await getExtensionUserId()
-
     const response = await fetch(
-      `${PAYMENT_CONFIG.api.checkSubscription}?userId=${encodeURIComponent(userId)}`
+      `https://www.apptoolspro.com/api/tabecho/subscription-status?userId=${encodeURIComponent(userId)}`
     )
 
     if (!response.ok) {
       throw new Error('Failed to check subscription status')
     }
 
-    const status: SubscriptionStatus = await response.json()
+    const data = await response.json()
+    return data.hasActiveSubscription
+  } catch (error) {
+    console.error('Error checking subscription:', error)
+    return false
+  }
+}
+
+/**
+ * Check subscription status from backend (legacy support)
+ */
+export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
+  try {
+    const userId = await getExtensionUserId()
+
+    // Use AppToolsPro API
+    const hasActiveSubscription = await checkSubscription(userId)
 
     // Update local settings based on subscription status
-    if (status.active) {
+    if (hasActiveSubscription) {
       await updateSettings({
         isPro: true,
         enableScreenshots: true,
@@ -258,6 +272,7 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
     }
 
     // Store subscription info
+    const status: SubscriptionStatus = { active: hasActiveSubscription }
     await chrome.storage.local.set({ subscriptionStatus: status })
 
     return status
@@ -270,6 +285,45 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
       return cached.subscriptionStatus as SubscriptionStatus
     }
     return { active: false }
+  }
+}
+
+/**
+ * Open payment page with user information
+ */
+export async function openPaymentPage(): Promise<void> {
+  try {
+    const userId = await getExtensionUserId()
+
+    // Get or prompt for email and userName
+    const userInfo = await chrome.storage.local.get(['userEmail', 'userName'])
+    let email = (typeof userInfo.userEmail === 'string' ? userInfo.userEmail : '') || ''
+    let userName = (typeof userInfo.userName === 'string' ? userInfo.userName : '') || ''
+
+    // If email is not set, prompt the user
+    if (!email) {
+      email = prompt('Please enter your email address:') || ''
+      if (email) {
+        await chrome.storage.local.set({ userEmail: email })
+      }
+    }
+
+    // If userName is not set, prompt the user
+    if (!userName) {
+      userName = prompt('Please enter your name:') || ''
+      if (userName) {
+        await chrome.storage.local.set({ userName: userName })
+      }
+    }
+
+    // Generate payment URL
+    const paymentUrl = `https://tabecho.apptoolspro.com/payment?userId=${encodeURIComponent(userId)}&email=${encodeURIComponent(email)}&userName=${encodeURIComponent(userName)}`
+
+    // Open payment page in new tab
+    chrome.tabs.create({ url: paymentUrl })
+  } catch (error) {
+    console.error('Error opening payment page:', error)
+    throw error
   }
 }
 

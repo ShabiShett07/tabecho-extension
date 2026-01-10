@@ -3,6 +3,7 @@ import './App.css'
 import Dashboard from './components/Dashboard'
 import Settings from './components/Settings'
 import { getSettings, updateSettings } from './storage/settings'
+import { openPaymentPage } from './services/payments'
 import type { TabEchoSettings } from './storage/db'
 
 type View = 'dashboard' | 'settings';
@@ -61,7 +62,7 @@ function App() {
               <span className="global-toggle-slider"></span>
             </label>
             {!settings.isPro && (
-              <button className="upgrade-btn" onClick={() => chrome.tabs.create({ url: 'https://tabecho.apptoolspro.com/payment' })}>
+              <button className="upgrade-btn" onClick={openPaymentPage}>
                 ⭐ Upgrade to Pro
               </button>
             )}

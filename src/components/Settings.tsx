@@ -4,6 +4,7 @@ import { updateSettings } from '../storage/settings'
 import {
   checkSubscriptionStatus,
   cancelSubscription,
+  openPaymentPage,
 } from '../services/payments'
 import './Settings.css'
 
@@ -223,11 +224,11 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
           ) : (
             <>
               <h3>Upgrade to TabEcho Pro</h3>
-              <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
+              <p style={{ marginBottom: '1.5rem', color: '#FFFFFF' }}>
                 Unlock all premium features including unlimited storage, screenshots, advanced search, and more.
               </p>
               <button
-                onClick={() => chrome.tabs.create({ url: 'https://tabecho.apptoolspro.com/payment' })}
+                onClick={openPaymentPage}
                 className="btn-primary"
                 style={{ width: '100%', padding: '1rem' }}
               >
@@ -291,13 +292,13 @@ export default function Settings({ settings, onUpdate }: SettingsProps) {
             TabEcho automatically archives your idle tabs so you never lose important content.
           </p>
           <p>
-            <a href="https://github.com/YOUR_USERNAME/tabecho-extension" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/ShabiShett07" target="_blank" rel="noopener noreferrer">
               GitHub
             </a>
             {' | '}
-            <a href="mailto:YOUR_EMAIL@example.com">Support</a>
+            <a href="mailto:support@apptoolspro.com">Support</a>
             {' | '}
-            <a href="https://YOUR_DOMAIN.com/privacy" target="_blank" rel="noopener noreferrer">
+            <a href="https://apptoolspro.com/privacy-policy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
             </a>
           </p>
